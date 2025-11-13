@@ -1,0 +1,41 @@
+# Workflow'un adı
+name: Gunluk BIST Verisi Cek
+
+# 1. TETİKLEYİCİ: Bu workflow'u ne zaman çalıştır?
+on:
+  # "schedule" (zamanlama) ile
+  schedule:
+    # cron job formatı: (dakika saat gün ay hafta)
+    # Bu ayar "Her gün UTC 17:00'de çalıştır" demektir.
+    # (TSİ yaklaşık 20:00'ye denk gelir)
+    - cron: '0 17 * * *'
+  
+  # "workflow_dispatch" ile
+  # Bu, "Actions" sekmesinden elle tetiklememizi sağlar (test için)
+  workflow_dispatch:
+
+# 2. İŞLER: Ne yapacak?
+jobs:
+  build-and-run:
+    # Hangi sunucuda çalışacak? (Ücretsiz Linux)
+    runs-on: ubuntu-latest
+
+    # 3. ADIMLAR: Sırayla hangi komutları çalıştıracak?
+    steps:
+      # Adım 1: Kodu sunucuya indir
+      - name: Kodu Checkout Yap
+        uses: actions/checkout@v4
+
+      # Adım 2: Python'u kur
+      - name: Python 3.10 Kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      # Adım 3: Gerekli kütüphaneleri kur
+      - name: Kütüphaneleri Yukle
+        run: pip install -r requirements.txt
+
+      # Adım 4: Bizim asıl script'imizi çalıştır
+      - name: Python Script'ini Calistir
+        run: python main.py
