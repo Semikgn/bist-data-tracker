@@ -39,3 +39,16 @@ jobs:
       # Adım 4: Bizim asıl script'imizi çalıştır
       - name: Python Script'ini Calistir
         run: python main.py
+
+      # Adım 5: Değişiklikleri Repoya Geri Commit'le
+      - name: Degisiklikleri Commit'le
+        uses: stefanzweifel/git-auto-commit-action@v5 # Hazır eylem
+        with:
+          # Commit'i atacak bot'un e-posta adresi
+          commit_user_email: "actions@github.com"
+          # Commit'i atacak bot'un adı
+          commit_user_name: "GitHub Actions Bot"
+          # Commit mesajı
+          commit_message: "Günlük BIST verileri eklendi (Otomatik)"
+          # Sadece bu dosyaları commit'le (güvenlik için)
+          file_pattern: "gunluk_veriler.csv"
