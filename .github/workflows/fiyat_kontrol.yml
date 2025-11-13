@@ -1,26 +1,22 @@
 # Workflow'un adı
 name: Gunluk BIST Verisi Cek
 
-# 1. TETİKLEYİCİ: Bu workflow'u ne zaman çalıştır?
+# 1. TETİKLEYİCİ
 on:
-  # "schedule" (zamanlama) ile
   schedule:
-    # cron job formatı: (dakika saat gün ay hafta)
-    # Bu ayar "Her gün UTC 17:00'de çalıştır" demektir.
-    # (TSİ yaklaşık 20:00'ye denk gelir)
     - cron: '0 17 * * *'
-  
-  # "workflow_dispatch" ile
-  # Bu, "Actions" sekmesinden elle tetiklememizi sağlar (test için)
   workflow_dispatch:
 
-# 2. İŞLER: Ne yapacak?
+# 2. İŞLER
 jobs:
   build-and-run:
-    # Hangi sunucuda çalışacak? (Ücretsiz Linux)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Hangi sunucuda çalışacak
 
-    # 3. ADIMLAR: Sırayla hangi komutları çalıştıracak?
+    # EKLENEN YENİ İZİN AYARI
+    permissions:
+      contents: write # Bot'a yazma izni veriyoruz
+
+    # 3. ADIMLAR
     steps:
       # Adım 1: Kodu sunucuya indir
       - name: Kodu Checkout Yap
@@ -42,13 +38,9 @@ jobs:
 
       # Adım 5: Değişiklikleri Repoya Geri Commit'le
       - name: Degisiklikleri Commit'le
-        uses: stefanzweifel/git-auto-commit-action@v5 # Hazır eylem
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          # Commit'i atacak bot'un e-posta adresi
           commit_user_email: "actions@github.com"
-          # Commit'i atacak bot'un adı
           commit_user_name: "GitHub Actions Bot"
-          # Commit mesajı
           commit_message: "Günlük BIST verileri eklendi (Otomatik)"
-          # Sadece bu dosyaları commit'le (güvenlik için)
           file_pattern: "gunluk_veriler.csv"
