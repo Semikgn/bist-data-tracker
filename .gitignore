@@ -1,0 +1,9 @@
+# Python'un oluşturduğu sistem dosyaları
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Sanal ortam klasörleri (eğer kullanırsak)
+venv/
+.venv/
