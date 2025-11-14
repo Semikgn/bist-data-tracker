@@ -37,21 +37,17 @@ def set_hisse(hisse_kodu):
 if not hisse_listesi:
     st.sidebar.warning("Veritabanında hiç hisse bulunamadı.")
 else:
+    # Sütun Başlıkları (tıklanabilir değil)
     col1, col2, col3 = st.sidebar.columns([3, 2, 2]) 
-    
-    with col1:
-        st.caption("Hisse") 
-    with col2:
-        st.caption("Son Fiyat") 
-    with col3:
-        st.caption("Değişim") 
-    
-    st.sidebar.divider()
+    with col1: st.caption("Hisse")
+    with col2: st.caption("Son Fiyat")
+    with col3: st.caption("Değişim")
+    st.sidebar.divider() 
 
+    # Her hisse için TIKLANABİLİR HTML hücresi oluştur
     for hisse in hisse_listesi:
         hisse_data = df[df['Hisse Kodu'] == hisse].sort_values('Date')
         
-        # Fiyat ve değişim hesaplaması
         last_price = 0.0
         delta_str = "---"
         color = "gray"
@@ -60,30 +56,29 @@ else:
             last_price = hisse_data.iloc[-1]['Close']
             prev_price = hisse_data.iloc[-2]['Close']
             change_pct = ((last_price - prev_price) / prev_price) * 100
-            delta_str = f"{change_pct:+.2f}%" # + veya - işaretiyle beraber
+            delta_str = f"{change_pct:+.2f}%" 
             color = "green" if change_pct > 0 else "red" if change_pct < 0 else "gray"
         elif len(hisse_data) == 1:
             last_price = hisse_data.iloc[-1]['Close']
 
-        # YATAY HÜCRE TASARIMI ---
-    
-        col1, col2, col3 = st.sidebar.columns([3, 2, 2])
+        # --- YENİ V3.0 TIKLANABİLİR HÜCRE ---
         
-        with col1:
-            st.button(
-                hisse, 
-                key=f"btn_{hisse}", 
-                on_click=set_hisse, 
-                args=(hisse,),
-                use_container_width=True
-            )
+        # O an seçili olan hisse ise, arka planı vurgula
+        is_selected = (hisse == st.session_state.secilen_hisse)
+        bg_color = "#2b3139" if is_selected else "transparent" # Vurgu rengi
         
-        with col2:
-            st.markdown(f"<div style='text-align: right; padding-top: 5px;'>{last_price:.2f}</div>", unsafe_allow_html=True)
-        
-        with col3:
-            st.markdown(f"<div style='color: {color}; text-align: right; padding-top: 5px;'>{delta_str}</div>", unsafe_allow_html=True)
-
+        st.markdown(f"""
+        <a href="?hisse={hisse}" target="_self" style="text-decoration: none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding: 5px 10px; border-radius: 5px; background-color: {bg_color}; margin-bottom: 5px;">
+                
+                <span style="color: white; font-weight: 500; flex: 3;">{hisse}</span>
+                
+                <span style="color: white; text-align: right; flex: 2; font-size: 0.9em;">{last_price:.2f}</span>
+                
+                <span style="color: {color}; text-align: right; flex: 2; font-size: 0.9em; font-weight: 500;">{delta_str}</span>
+            </div>
+        </a>
+        """, unsafe_allow_html=True)
 # Grafik ve Tablo
 secilen_hisse_kodu = st.session_state.secilen_hisse
 
@@ -122,9 +117,9 @@ if secilen_hisse_kodu:
         st.altair_chart(price_chart, use_container_width=True)
 
         # --- Ham Veri Tablosu ---
-        st.subheader("Son 50 Gün Tablosu")
+        st.subheader("Son 7 Gün Tablosu")
         df_tablo = df_filtrelenmis.set_index('Date')
-        st.dataframe(df_tablo.tail(50))
+        st.dataframe(df_tablo.tail(7))
 
         # --- Hacim Grafiği ---
         st.subheader("Hacim (Volume) Grafiği")
