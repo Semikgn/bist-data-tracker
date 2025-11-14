@@ -28,7 +28,7 @@ else:
 tum_yeni_veriler = [] 
 print(f"Hisseler için son '{total_period}' verisi çekiliyor...")
 
-for hisse_kodu in hisseler_listesi:
+for hisse_kodu in hisseler:
     try:
         hisse = yf.Ticker(hisse_kodu)
         gunluk_veri = hisse.history(period=total_period) # "2mo" parametresi kullanılıyor
