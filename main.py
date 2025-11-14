@@ -7,7 +7,7 @@ pd.set_option('display.width', 1000)
 
 hisseler = ["THYAO.IS", "GARAN.IS", "TUPRS.IS", "MIATK.IS"]
 csv_dosyasi = 'gunluk_veriler.csv'
-total_period = "10d"
+total_period = "30d"
 
 print(f"Mevcut veritabanı '{csv_dosyasi}' okunuyor...")
 current_db = set()
