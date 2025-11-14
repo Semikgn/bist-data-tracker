@@ -26,12 +26,12 @@ else:
     print("Mevcut veritabanı bulunamadı, sıfırdan oluşturulacak.")
 
 tum_yeni_veriler = [] 
-print(f"Hisseler için son '{CIKTI_PERIYODU}' verisi çekiliyor...")
+print(f"Hisseler için son '{total_period}' verisi çekiliyor...")
 
 for hisse_kodu in hisseler_listesi:
     try:
         hisse = yf.Ticker(hisse_kodu)
-        gunluk_veri = hisse.history(period=CIKTI_PERIYODU) # "2mo" parametresi kullanılıyor
+        gunluk_veri = hisse.history(period=total_period) # "2mo" parametresi kullanılıyor
 
         if gunluk_veri.empty:
             print(f"-> '{hisse_kodu}' için veri bulunamadı.")
