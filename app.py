@@ -26,13 +26,13 @@ df_filtrelenmis = df[df['Hisse Kodu'] == secilen_hisse].copy()
 
 # Temel (base) grafiği oluştur
 base = alt.Chart(df_filtrelenmis).encode(
-    # X ekseni Tarih olsun (T = Temporal/Zamana bağlı)
-    x=alt.X('Date:T', title='Tarih'),
-    # Y ekseni Kapanış Fiyatı olsun (Q = Quantitative/Sayısal)
-    y=alt.Y('Close', title='Kapanış Fiyatı (TL)'),
-    # Grafiğin üzerine gelince hangi verilerin görüneceği
+
+    x=alt.X('Date:T', title='Tarih'),    
+    y=alt.Y('Close', title='Kapanış Fiyatı (TL)', scale=alt.Scale(zero=True)),
+    
     tooltip=['Date', 'Hisse Kodu', 'Open', 'High', 'Low', 'Close', 'Volume']
 )
+
 line = base.mark_line(color='#1f77b4')
 points = base.mark_circle(size=60, color='#ff7f0e')
 
