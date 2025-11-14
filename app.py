@@ -36,9 +36,9 @@ if not hisse_listesi:
     st.sidebar.warning("Veritabanında hiç hisse bulunamadı.")
 else:
     col1, col2, col3 = st.sidebar.columns([3, 2, 2]) 
-    with col1: st.caption("Hisse")
-    with col2: st.caption("Son Fiyat")
-    with col3: st.caption("Değişim")
+    with col1: st.sidebar.caption("Hisse")
+    with col2: st.sidebar.caption("Son Fiyat")
+    with col3: st.sidebar.caption("Değişim")
     st.sidebar.divider() 
 
     for hisse in hisse_listesi:
@@ -52,7 +52,7 @@ else:
             last_price = hisse_data.iloc[-1]['Close']
             prev_price = hisse_data.iloc[-2]['Close']
             change_pct = ((last_price - prev_price) / prev_price) * 100
-            delta_str = f"{change_pct:+.2f}%" 
+            delta_str = f"{change_pct:+.2f}%"
             color = "green" if change_pct > 0 else "red" if change_pct < 0 else "gray"
         elif len(hisse_data) == 1:
             last_price = hisse_data.iloc[-1]['Close']
@@ -60,7 +60,7 @@ else:
         is_selected = (hisse == st.session_state.secilen_hisse)
         bg_color = "#2b3139" if is_selected else "transparent"
         
-        st.markdown(f"""
+        st.sidebar.markdown(f"""
         <a href="?hisse={hisse}" target="_self" style="text-decoration: none;">
             <div style="display:flex; justify-content:space-between; align-items:center; padding: 5px 10px; border-radius: 5px; background-color: {bg_color}; margin-bottom: 5px;">
                 <span style="color: white; font-weight: 500; flex: 3;">{hisse}</span>
@@ -69,6 +69,7 @@ else:
             </div>
         </a>
         """, unsafe_allow_html=True)
+
 
 secilen_hisse_kodu = st.session_state.secilen_hisse
 
