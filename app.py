@@ -4,7 +4,7 @@ import altair as alt
 
 st.set_page_config(layout="wide")
 
-st.title("BIST Veri Takipçisi V3 📈")
+st.title("BIST Veri Takipçisi V3")
 st.write("Bu proje, GitHub Actions ile toplanan BIST verilerini gösterir.")
 
 try:
@@ -35,11 +35,16 @@ st.sidebar.header("Hisse Listesi")
 if not hisse_listesi:
     st.sidebar.warning("Veritabanında hiç hisse bulunamadı.")
 else:
-    col1, col2, col3 = st.sidebar.columns([3, 2, 2]) 
-    with col1: st.sidebar.caption("Hisse")
-    with col2: st.sidebar.caption("Son Fiyat")
-    with col3: st.sidebar.caption("Değişim")
-    st.sidebar.divider() 
+    st.sidebar.markdown(f"""
+    <div style="display:flex; justify-content:space-between; align-items:center; padding: 5px 10px; border-bottom: 1px solid #333; margin-bottom: 5px;">
+        
+        <span style="font-weight: 500; color: #888; font-size: 0.8em; flex: 3;">Hisse</span>
+        
+        <span style="font-weight: 500; color: #888; font-size: 0.8em; text-align: right; flex: 2;">Son Fiyat</span>
+        
+        <span style="font-weight: 500; color: #888; font-size: 0.8em; text-align: right; flex: 2;">Değişim</span>
+    </div>
+    """, unsafe_allow_html=True)
 
     for hisse in hisse_listesi:
         hisse_data = df[df['Hisse Kodu'] == hisse].sort_values('Date')
@@ -103,7 +108,7 @@ if secilen_hisse_kodu:
         price_chart = (line + points).interactive()
         st.altair_chart(price_chart, use_container_width=True)
 
-        st.subheader("Ham Veri Tablosu (Son 50 Gün)")
+        st.subheader("Son 7 Gün Tablosu")
         df_tablo = df_filtrelenmis.set_index('Date')
         st.dataframe(df_tablo.tail(50))
         
