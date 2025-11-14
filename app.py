@@ -109,39 +109,39 @@ if secilen_hisse_kodu:
 
         # ------- Graph and Volume Graph Part ------
         
-        df_filtrelenmis['color'] = df_filtrelenmis.apply(
-            lambda row: 'green' if row['Close'] >= row['Open'] else 'red', 
-            axis=1
-        ) #Calculation to choose color
-        
-        # 2. Fiyat Grafiği
-        price_base = alt.Chart(df_filtrelenmis).encode(
-            x=alt.X('Date:T', title='Tarih', scale=x_scale, axis=None), 
+        base = alt.Chart(df_filtrelenmis).encode(
+            # X EKSENİ ETİKETLERİ GERİ GELDİ (axis=None kaldırıldı)
+            x=alt.X('Date:T', title='Tarih', scale=x_scale), 
             y=alt.Y('Close', title='Kapanış Fiyatı (TL)', scale=y_scale),
             tooltip=['Date', 'Hisse Kodu', 'Open', 'High', 'Low', 'Close', 'Volume']
         )
-        price_line = price_base.mark_line(color='#1f77b4')
-        price_points = price_base.mark_circle(size=60, color='#ff7f0e')
-        price_chart = (price_line + price_points).interactive() # Zoom/pan için interaktif
+        line = base.mark_line(color='#1f77b4')
+        points = base.mark_circle(size=60, color='#ff7f0e')
+        price_chart = (line + points).interactive()
+        
+        st.altair_chart(price_chart, use_container_width=True)
 
-        # 3. Hacim Grafiği
+        # --- Ham Veri Tablosu ---
+        st.subheader("Son 50 Gün Tablosu")
+        df_tablo = df_filtrelenmis.set_index('Date')
+        st.dataframe(df_tablo.tail(50))
+
+        # --- Hacim Grafiği ---
+        st.subheader("Hacim (Volume) Grafiği")
+        
+        # Renk hesaplamasını yap
+        df_filtrelenmis['color'] = df_filtrelenmis.apply(
+            lambda row: 'green' if row['Close'] >= row['Open'] else 'red', 
+            axis=1
+        )
+        
         volume_chart = alt.Chart(df_filtrelenmis).mark_bar().encode(
-            x=alt.X('Date:T', title='Tarih', scale=x_scale), 
+            x=alt.X('Date:T', title='Tarih', scale=x_scale),
             y=alt.Y('Volume', title='Hacim'),
-
             color=alt.Color('color', scale={'domain': ['green', 'red'], 'range': ['#2ca02c', '#d62728']}, legend=None),
             tooltip=['Date', 'Volume', 'Close', 'Open']
         ).interactive()
 
-        final_chart = alt.vconcat(price_chart, volume_chart).resolve_scale(
-            x='shared'
-        )
-
-        st.altair_chart(final_chart, use_container_width=True)
-
-    # --- Ham Veri Tablosu ---
-    st.subheader("Ham Veri Tablosu (Son 50 Gün)")
-    df_tablo = df_filtrelenmis.set_index('Date')
-    st.dataframe(df_tablo.tail(50))
+        st.altair_chart(volume_chart, use_container_width=True)
 else:
     st.error("Veritabanında görüntülenecek hiç hisse yok.")
