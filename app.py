@@ -19,21 +19,26 @@ except pd.errors.EmptyDataError:
     st.warning("Veritabanı ('gunluk_veriler.csv') şu anda boş. Lütfen V1 otomasyonunun çalışmasını bekleyin.")
     st.stop()
 
-# Session State
+# --- 1. Hafıza (Session State) ve URL Parametresi ---
 hisse_listesi = sorted(df['Hisse Kodu'].unique())
+
+# URL'den 'hisse' parametresini oku (Tıklama mekanizması)
+query_params = st.query_params
+if "hisse" in query_params:
+    # URL'de bir hisse varsa, hafızadaki 'secilen_hisse'yi GÜNCELLE
+    st.session_state.secilen_hisse = query_params["hisse"]
+    # URL'i temizle (sayfanın normal görünmesi için)
+    st.query_params.clear()
+
+# Eğer hafızada 'secilen_hisse' hala yoksa (ilk açılış)
 if 'secilen_hisse' not in st.session_state:
     if hisse_listesi:
         st.session_state.secilen_hisse = hisse_listesi[0]
     else:
         st.session_state.secilen_hisse = None
 
+# --- 2. Kenar Çubuğu (Sidebar) Mantığı (V3.0 - HTML/CSS) ---
 st.sidebar.header("Hisse Listesi")
-
-# Hafızayı güncelleyecek yardımcı fonksiyon
-def set_hisse(hisse_kodu):
-    st.session_state.secilen_hisse = hisse_kodu
-
-# Her hisse için "Hücre" oluştur --------------------------------------
 if not hisse_listesi:
     st.sidebar.warning("Veritabanında hiç hisse bulunamadı.")
 else:
@@ -79,6 +84,7 @@ else:
             </div>
         </a>
         """, unsafe_allow_html=True)
+        
 # Grafik ve Tablo
 secilen_hisse_kodu = st.session_state.secilen_hisse
 
