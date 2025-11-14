@@ -1,0 +1,31 @@
+import streamlit as st 
+import pandas as pd
+
+st.set_page_config(layout = "wide")
+
+st.title("Bist Veri Takipçisi V2")
+st.write("Bist verileriyle görselleştirme ve analiz tahmin operayonlarını geliştirmekteyiz...")
+
+try:
+    csv_dosyasi = "gunluk_veriler.csv"
+    df = pd.read_csv(csv_dosyasi)
+    df['Date'] = pd.to_datetime(df['Date'])
+
+except FileNotFoundError:
+    st.error(f"Hata: '{csv_dosyasi}' bulunamadı. ")
+    st.stop()
+
+# --- Arayüz Tasarımı ---
+st.sidebar.header("Filtreler")
+hisseler = df['Hisse Kodu'].unique()
+secilen_hisse = st.sidebar.selectbox("Hisse kodu seçin: ", hisseler)
+
+st.header(f"{secilen_hisse} Fiyat Grafiği")
+
+df_filtrelenmis = df[df['Hisse Kodu'] == secilen_hisse].copy()
+df_filtrelenmis.set_index('Date', inplace=True)
+
+st.line_chart(df_filtrelenmis['Close'])
+
+st.subheader("Ham veri Tablosu (Son 50 Gün)")
+st.dataframe(df_filtrelenmis.tail(50))
