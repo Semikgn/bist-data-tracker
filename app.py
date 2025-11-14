@@ -115,7 +115,7 @@ if secilen_hisse_kodu:
 
         st.subheader("Son 7 Gün Tablosu")
         df_tablo = df_filtrelenmis.set_index('Date')
-        st.dataframe(df_tablo.tail(50))
+        st.dataframe(df_tablo.tail(7))
         
         st.subheader("Hacim (Volume) Grafiği")
         df_filtrelenmis['color'] = df_filtrelenmis.apply(
