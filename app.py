@@ -25,21 +25,35 @@ st.header(f"{secilen_hisse} Fiyat Grafiği")
 
 df_filtrelenmis = df[df['Hisse Kodu'] == secilen_hisse].copy()
 
-# Temel (base) grafiği oluştur
+if not df_filtrelenmis.empty:
+    y_min = df_filtrelenmis['Close'].min()
+    y_max = df_filtrelenmis['Close'].max()
+    padding = (y_max - y_min) * 0.1 
+    
+    y_domain_min = max(0, y_min - padding) # 0'ın altına düşmesini engelle
+    y_domain_max = y_max + padding
+    
+    y_scale = alt.Scale(domain=[y_domain_min, y_domain_max])
+else:
+    y_scale = alt.Scale(zero=True)
+
 base = alt.Chart(df_filtrelenmis).encode(
 
     x=alt.X('Date:T', title='Tarih'),    
-    y=alt.Y('Close', title='Kapanış Fiyatı (TL)', scale=alt.Scale(zero=True)),
+    y=alt.Y('Close', title='Kapanış Fiyatı (TL)', scale=y_scale), # <- DEĞİŞİKLİK BURADA
     
     tooltip=['Date', 'Hisse Kodu', 'Open', 'High', 'Low', 'Close', 'Volume']
 )
 
 line = base.mark_line(color='#1f77b4')
+
 points = base.mark_circle(size=60, color='#ff7f0e')
 
 chart = (line + points).interactive()
+
 st.altair_chart(chart, use_container_width=True)
 
 st.subheader("Ham Veri Tablosu (Son 50 Gün)")
+
 df_tablo = df_filtrelenmis.set_index('Date')
 st.dataframe(df_tablo.tail(50))
