@@ -68,9 +68,9 @@ for hisse in hisse_listesi:
 # Grafik ve Tablo
 secilen_hisse_kodu = st.session_state.secilen_hisse
 
-st.header(f"{secilen_hisse} Fiyat Grafiği")
+st.header(f"{secilen_hisse_kodu} Fiyat Grafiği")
 
-df_filtrelenmis = df[df['Hisse Kodu'] == secilen_hisse].copy()
+df_filtrelenmis = df[df['Hisse Kodu'] == secilen_hisse_kodu].copy()
 
 if df_filtrelenmis.empty:
     st.warning("Bu hisse için veri bulunamadı.")
