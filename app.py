@@ -23,9 +23,22 @@ secilen_hisse = st.sidebar.selectbox("Hisse kodu seçin: ", hisseler)
 st.header(f"{secilen_hisse} Fiyat Grafiği")
 
 df_filtrelenmis = df[df['Hisse Kodu'] == secilen_hisse].copy()
-df_filtrelenmis.set_index('Date', inplace=True)
 
-st.line_chart(df_filtrelenmis['Close'])
+# Temel (base) grafiği oluştur
+base = alt.Chart(df_filtrelenmis).encode(
+    # X ekseni Tarih olsun (T = Temporal/Zamana bağlı)
+    x=alt.X('Date:T', title='Tarih'),
+    # Y ekseni Kapanış Fiyatı olsun (Q = Quantitative/Sayısal)
+    y=alt.Y('Close', title='Kapanış Fiyatı (TL)'),
+    # Grafiğin üzerine gelince hangi verilerin görüneceği
+    tooltip=['Date', 'Hisse Kodu', 'Open', 'High', 'Low', 'Close', 'Volume']
+)
+line = base.mark_line(color='#1f77b4')
+points = base.mark_circle(size=60, color='#ff7f0e')
 
-st.subheader("Ham veri Tablosu (Son 50 Gün)")
-st.dataframe(df_filtrelenmis.tail(50))
+chart = (line + points).interactive()
+st.altair_chart(chart, use_container_width=True)
+
+st.subheader("Ham Veri Tablosu (Son 50 Gün)")
+df_tablo = df_filtrelenmis.set_index('Date')
+st.dataframe(df_tablo.tail(50))
