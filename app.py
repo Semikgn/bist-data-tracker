@@ -87,38 +87,61 @@ else:
 # Grafik ve Tablo
 secilen_hisse_kodu = st.session_state.secilen_hisse
 
-st.header(f"{secilen_hisse_kodu} Fiyat Grafiği")
+if secilen_hisse_kodu:
+    st.header(f"{secilen_hisse_kodu} Fiyat Grafiği")
+    df_filtrelenmis = df[df['Hisse Kodu'] == secilen_hisse_kodu].copy()
 
-df_filtrelenmis = df[df['Hisse Kodu'] == secilen_hisse_kodu].copy()
+    if df_filtrelenmis.empty:
+        st.warning("Bu hisse için veri bulunamadı.")
+    else:
+        df_recent = df_filtrelenmis.tail(30) 
+        x_domain_min = df_recent['Date'].min()
+        x_domain_max = df_recent['Date'].max()
+        x_padding = (x_domain_max - x_domain_min) * 0.05 
+        x_scale = alt.Scale(domain=[x_domain_min - x_padding, x_domain_max + x_padding])
 
-if df_filtrelenmis.empty:
-    st.warning("Bu hisse için veri bulunamadı.")
+        y_min = df_recent['Close'].min()
+        y_max = df_recent['Close'].max()
+        y_padding = (y_max - y_min) * 0.15 
+        y_domain_min = max(0, y_min - y_padding) 
+        y_domain_max = y_max + y_padding
+        y_scale = alt.Scale(domain=[y_domain_min, y_domain_max])
+
+        # ------- Graph and Volume Graph Part ------
+        
+        df_filtrelenmis['color'] = df_filtrelenmis.apply(
+            lambda row: 'green' if row['Close'] >= row['Open'] else 'red', 
+            axis=1
+        ) #Calculation to choose color
+        
+        # 2. Fiyat Grafiği
+        price_base = alt.Chart(df_filtrelenmis).encode(
+            x=alt.X('Date:T', title='Tarih', scale=x_scale, axis=None), 
+            y=alt.Y('Close', title='Kapanış Fiyatı (TL)', scale=y_scale),
+            tooltip=['Date', 'Hisse Kodu', 'Open', 'High', 'Low', 'Close', 'Volume']
+        )
+        price_line = price_base.mark_line(color='#1f77b4')
+        price_points = price_base.mark_circle(size=60, color='#ff7f0e')
+        price_chart = (price_line + price_points).interactive() # Zoom/pan için interaktif
+
+        # 3. Hacim Grafiği
+        volume_chart = alt.Chart(df_filtrelenmis).mark_bar().encode(
+            x=alt.X('Date:T', title='Tarih', scale=x_scale), 
+            y=alt.Y('Volume', title='Hacim'),
+
+            color=alt.Color('color', scale={'domain': ['green', 'red'], 'range': ['#2ca02c', '#d62728']}, legend=None),
+            tooltip=['Date', 'Volume', 'Close', 'Open']
+        ).interactive()
+
+        final_chart = alt.vconcat(price_chart, volume_chart).resolve_scale(
+            x='shared'
+        )
+
+        st.altair_chart(final_chart, use_container_width=True)
+
+    # --- Ham Veri Tablosu ---
+    st.subheader("Ham Veri Tablosu (Son 50 Gün)")
+    df_tablo = df_filtrelenmis.set_index('Date')
+    st.dataframe(df_tablo.tail(50))
 else:
-    df_recent = df_filtrelenmis.tail(30)
-
-    x_domain_min = df_recent['Date'].min()
-    x_domain_max = df_recent['Date'].max()
-    x_padding = (x_domain_max - x_domain_min) * 0.05 
-    x_scale = alt.Scale(domain=[x_domain_min - x_padding, x_domain_max + x_padding])
-
-    y_min = df_recent['Close'].min()
-    y_max = df_recent['Close'].max()
-    y_padding = (y_max - y_min) * 0.15 
-    y_domain_min = max(0, y_min - y_padding)
-    y_domain_max = y_max + y_padding
-    y_scale = alt.Scale(domain=[y_domain_min, y_domain_max])
-
-    base = alt.Chart(df_filtrelenmis).encode(
-        x=alt.X('Date:T', title='Tarih', scale=x_scale),
-        y=alt.Y('Close', title='Kapanış Fiyatı (TL)', scale=y_scale),
-        tooltip=['Date', 'Hisse Kodu', 'Open', 'High', 'Low', 'Close', 'Volume']
-    )
-
-    line = base.mark_line(color='#1f77b4')
-    points = base.mark_circle(size=60, color='#ff7f0e')
-    chart = (line + points).interactive()
-    st.altair_chart(chart, use_container_width=True)
-
-st.subheader("Ham Veri Tablosu (Son 50 Gün)")
-df_tablo = df_filtrelenmis.set_index('Date')
-st.dataframe(df_tablo.tail(50))
+    st.error("Veritabanında görüntülenecek hiç hisse yok.")
