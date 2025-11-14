@@ -18,9 +18,9 @@ except pd.errors.EmptyDataError:
     st.warning("Veritabanı ('gunluk_veriler.csv') şu anda boş. Lütfen V1 otomasyonunun çalışmasını bekleyin.")
     st.stop()
 
-st.sidebar.header("Filtreler")
+st.sidebar.header("Hisse Listesi")
 hisse_listesi = sorted(df['Hisse Kodu'].unique())
-secilen_hisse = st.sidebar.selectbox("Hisse Kodu Seçin:", hisse_listesi)
+secilen_hisse = st.sidebar.radio("Grafiği Görüntüle:", hisse_listesi)
 
 st.header(f"{secilen_hisse} Fiyat Grafiği")
 
