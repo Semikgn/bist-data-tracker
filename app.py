@@ -31,21 +31,23 @@ if 'secilen_hisse' not in st.session_state:
     else:
         st.session_state.secilen_hisse = None
 
+# --- 2. Kenar Çubuğu (Sidebar) Mantığı (V3.3 - HTML Düzeltmesi) ---
 st.sidebar.header("Hisse Listesi")
 if not hisse_listesi:
     st.sidebar.warning("Veritabanında hiç hisse bulunamadı.")
 else:
+    # --- HTML BAŞLIKLAR (HİZALAMA İÇİN) ---
     st.sidebar.markdown(f"""
     <div style="display:flex; justify-content:space-between; align-items:center; padding: 5px 10px; border-bottom: 1px solid #333; margin-bottom: 5px;">
-        
         <span style="font-weight: 500; color: #888; font-size: 0.8em; flex: 3;">Hisse</span>
-        
         <span style="font-weight: 500; color: #888; font-size: 0.8em; text-align: right; flex: 2;">Son Fiyat</span>
-        
         <span style="font-weight: 500; color: #888; font-size: 0.8em; text-align: right; flex: 2;">Değişim</span>
     </div>
-    """, unsafe_allow_html=True)
+    """, 
+    unsafe_allow_html=True  
+    )
 
+    # Her hisse için TIKLANABİLİR HTML hücresi oluştur
     for hisse in hisse_listesi:
         hisse_data = df[df['Hisse Kodu'] == hisse].sort_values('Date')
         
@@ -57,11 +59,12 @@ else:
             last_price = hisse_data.iloc[-1]['Close']
             prev_price = hisse_data.iloc[-2]['Close']
             change_pct = ((last_price - prev_price) / prev_price) * 100
-            delta_str = f"{change_pct:+.2f}%"
+            delta_str = f"{change_pct:+.2f}%" 
             color = "green" if change_pct > 0 else "red" if change_pct < 0 else "gray"
         elif len(hisse_data) == 1:
             last_price = hisse_data.iloc[-1]['Close']
 
+        # --- Tıklanabilir Hücre ---
         is_selected = (hisse == st.session_state.secilen_hisse)
         bg_color = "#2b3139" if is_selected else "transparent"
         
@@ -73,7 +76,9 @@ else:
                 <span style="color: {color}; text-align: right; flex: 2; font-size: 0.9em; font-weight: 500;">{delta_str}</span>
             </div>
         </a>
-        """, unsafe_allow_html=True)
+        """, 
+        unsafe_allow_html=True 
+        )
 
 
 secilen_hisse_kodu = st.session_state.secilen_hisse
